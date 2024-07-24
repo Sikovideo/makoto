@@ -23,11 +23,13 @@
             padding: 10px 20px;
         }
         .special {
-            background-size: cover;
+            background-size: contain;
+            background-repeat: no-repeat;
             color: transparent;
-            width: 1em;
-            height: 1em;
+            width: 2em;
+            height: 2.667em; /* 768 / 1024 = 0.75, 2em * 0.75 = 1.5em */
             display: inline-block;
+            vertical-align: middle;
         }
         .special.ma {
             background-image: url('ま.png'); /* 'ま' の画像ファイル名 */
@@ -41,7 +43,7 @@
     </style>
 </head>
 <body>
-    <img id="titleImage" src="title.jpg" alt="らんだむまこと.png"> <!-- タイトル画像ファイル名を指定 -->
+    <img id="titleImage" src="title.jpg" alt="タイトル画像"> <!-- タイトル画像ファイル名を指定 -->
     <div id="randomHiragana">「まこと」を目指してボタンを押そう！</div>
     <button onclick="generateRandomHiragana()">まこちん</button>
 
