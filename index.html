@@ -86,6 +86,8 @@
 
         // Firebaseの初期化
         firebase.initializeApp(firebaseConfig);
+
+        // データベースへの参照を取得
         const database = firebase.database();
 
         function generateRandomHiragana() {
