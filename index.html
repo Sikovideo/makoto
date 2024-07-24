@@ -122,10 +122,14 @@
             document.getElementById('randomHiragana').innerHTML = displayHiragana;
 
             // Firebaseにデータを保存
-            const newLogRef = firebase.database().ref('logs').push();
+            const newLogRef = database.ref('logs').push();
             newLogRef.set({
                 hiragana: displayHiragana,
                 timestamp: new Date().toISOString()
+            }).then(() => {
+                console.log('データがFirebaseに保存されました');
+            }).catch((error) => {
+                console.error('データの保存に失敗しました:', error);
             });
 
             // チェック「まこと」の文字が揃ったかどうか
@@ -135,7 +139,7 @@
         }
 
         function setupRealTimeListener() {
-            const logRef = firebase.database().ref('logs');
+            const logRef = database.ref('logs');
             logRef.on('child_added', (data) => {
                 const log = data.val();
                 const logItem = document.createElement('li');
