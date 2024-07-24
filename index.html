@@ -68,24 +68,25 @@
     <ul id="logList"></ul>
 
     <!-- Firebase SDKの追加 -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getDatabase, ref, set, onChildAdded } from "firebase/database";
 
-    <script>
         // Firebaseの設定
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyC1C98HczwnFk3L8CGlB-NFt2W95inTGS4",
+            authDomain: "makotorandam.firebaseapp.com",
+            databaseURL: "https://makotorandam-default-rtdb.firebaseio.com",
+            projectId: "makotorandam",
+            storageBucket: "makotorandam.appspot.com",
+            messagingSenderId: "987469663464",
+            appId: "1:987469663464:web:1c02dc8df2a2f887b3cd5d",
+            measurementId: "G-GCSZFKP99J"
         };
 
         // Firebaseの初期化
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
         function generateRandomHiragana() {
             const hiragana = [
@@ -121,8 +122,8 @@
             document.getElementById('randomHiragana').innerHTML = displayHiragana;
 
             // Firebaseにデータを保存
-            const newLogRef = database.ref('logs').push();
-            newLogRef.set({
+            const newLogRef = ref(database, 'logs').push();
+            set(newLogRef, {
                 hiragana: displayHiragana,
                 timestamp: new Date().toISOString()
             });
@@ -133,15 +134,19 @@
             }
         }
 
-        window.onload = function() {
-            const logList = document.getElementById('logList');
-            database.ref('logs').on('child_added', (snapshot) => {
-                const log = snapshot.val();
+        function setupRealTimeListener() {
+            const logRef = ref(database, 'logs');
+            onChildAdded(logRef, (data) => {
+                const log = data.val();
                 const logItem = document.createElement('li');
                 logItem.innerHTML = `${log.hiragana} <small>${log.timestamp}</small>`;
-                logList.appendChild(logItem);
+                document.getElementById('logList').appendChild(logItem);
             });
         }
+
+        window.onload = function() {
+            setupRealTimeListener();
+        };
     </script>
 </body>
 </html>
