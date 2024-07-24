@@ -63,7 +63,7 @@
     <div id="randomHiraganaContainer">
         <div id="randomHiragana">「まこと」を目指してボタンを押そう！</div>
     </div>
-    <button onclick="generateRandomHiragana()">まこちん</button>
+    <button id="generateButton">まこちん</button>
     <h2>リアルタイムログ</h2>
     <ul id="logList"></ul>
 
@@ -146,6 +146,7 @@
 
         window.onload = function() {
             setupRealTimeListener();
+            document.getElementById('generateButton').addEventListener('click', generateRandomHiragana);
         };
     </script>
 </body>
