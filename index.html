@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ランダムまこと</title>
+    <title>リアルタイムログ</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,13 +11,13 @@
             margin-top: 50px;
         }
         #titleImage {
-            width: 100%; /* 画像の幅を画面に収まるように調整 */
-            max-width: 350.3px; /* 画像の元サイズに基づく最大幅 */
+            width: 100%;
+            max-width: 350px;
             height: auto;
             margin-bottom: 20px;
         }
         #randomHiraganaContainer {
-            height: 100px; /* 固定高さを設定 */
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -31,23 +31,30 @@
             padding: 10px 20px;
             margin-top: 20px;
         }
+        #logList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #logList li {
+            margin: 5px 0;
+        }
         .special {
             background-size: contain;
             background-repeat: no-repeat;
             color: transparent;
             width: 2em;
-            height: 2.667em; /* 768 / 1024 = 0.75, 2em * 0.75 = 1.5em */
+            height: 2.667em;
             display: inline-block;
             vertical-align: middle;
         }
         .special.ma {
-            background-image: url('ま.png'); /* 'ま' の画像ファイル名 */
+            background-image: url('ま.png');
         }
         .special.ko {
-            background-image: url('こ.png'); /* 'こ' の画像ファイル名 */
+            background-image: url('こ.png');
         }
         .special.to {
-            background-image: url('と.png'); /* 'と' の画像ファイル名 */
+            background-image: url('と.png');
         }
     </style>
 </head>
@@ -57,8 +64,29 @@
         <div id="randomHiragana">「まこと」を目指してボタンを押そう！</div>
     </div>
     <button onclick="generateRandomHiragana()">まこちん</button>
+    <h2>リアルタイムログ</h2>
+    <ul id="logList"></ul>
+
+    <!-- Firebase SDKの追加 -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
 
     <script>
+        // Firebaseの設定
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Firebaseの初期化
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         function generateRandomHiragana() {
             const hiragana = [
                 'あ', 'い', 'う', 'え', 'お',
@@ -88,14 +116,31 @@
                     default:
                         return char;
                 }
-            });
+            }).join(' ');
 
-            document.getElementById('randomHiragana').innerHTML = displayHiragana.join(' ');
+            document.getElementById('randomHiragana').innerHTML = displayHiragana;
+
+            // Firebaseにデータを保存
+            const newLogRef = database.ref('logs').push();
+            newLogRef.set({
+                hiragana: displayHiragana,
+                timestamp: new Date().toISOString()
+            });
 
             // チェック「まこと」の文字が揃ったかどうか
             if (randomHiragana.includes('ま') && randomHiragana.includes('こ') && randomHiragana.includes('と')) {
                 alert('「まこと」が揃いました！');
             }
+        }
+
+        window.onload = function() {
+            const logList = document.getElementById('logList');
+            database.ref('logs').on('child_added', (snapshot) => {
+                const log = snapshot.val();
+                const logItem = document.createElement('li');
+                logItem.innerHTML = `${log.hiragana} <small>${log.timestamp}</small>`;
+                logList.appendChild(logItem);
+            });
         }
     </script>
 </body>
